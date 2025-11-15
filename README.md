@@ -1,6 +1,8 @@
-# Room_Practice_tracker
+# 🧭 Room_Practice_tracker
 
-# Description
+---
+
+## Description
 This is flask app is built for keeping the track of your rooms that you have solved over THM/HTB/Cyberdefenders etc.
 
 This tool helps you build consistency in CTF training.  
