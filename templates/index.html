@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="card p-3">
+      <h5 class="mb-3">Add / Log a Room</h5>
+      <form action="{{ url_for('add_room') }}" method="POST" class="vstack gap-2">
+        <div>
+          <label class="form-label">Room Name</label>
+          <input type="text" name="name" class="form-control" placeholder="e.g. THM - Rabbit Store" required>
+        </div>
+        <div>
+          <label class="form-label">Platform</label>
+          <select name="platform" class="form-select">
+            <option value="THM">TryHackMe</option>
+            <option value="HTB">Hack The Box</option>
+            <option value="CyberDefenders">CyberDefenders</option>
+            <option value="Local">Local Lab</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <!-- For Others -->
+        <div id="otherSourceDiv" style="display:none;">
+          <label class="form-label mt-2">Specify the source</label>
+          <label type="text" class="form-control" name="other_source" placeholder="VulnHub, OverTheWire..."></label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" name="used_writeup" id="used_writeup">
+          <label class="form-check-label" for="used_writeup">
+            I used a writeup / walkthrough
+          </label>
+        </div>
+        <div>
+          <label class="form-label">Solved Date (DD-MM-YYYY)</label>
+          <input type="text" name="solved_at" class="form-control"
+                 placeholder="DD-MM-YYYY" value="{{ today_dmy }}">
+        </div>
+        <div>
+          <label class="form-label">Redo On (DD-MM-YYYY, leave empty to auto +7 days)</label>
+          <input type="text" name="redo_at" class="form-control" placeholder="DD-MM-YYYY">
+        </div>
+        <div>
+          <label class="form-label">Notes (what blocked you, what you learned)</label>
+          <textarea name="notes" class="form-control" rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary mt-2">Save Room</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="col-lg-8">
+    <div class="card p-3">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h5 class="mb-0">Your Rooms</h5>
+        <span class="small">Sorted by redo date</span>
+      </div>
+      {% if rooms %}
+        <div class="table-responsive">
+          <table class="table table-dark table-striped align-middle">
+            <thead>
+              <tr>
+                <th>Room</th>
+                <th>Platform</th>
+                <th>Solved</th>
+                <th>Redo</th>
+                <th>Writeup?</th>
+                <th>Notes</th>
+                <th style="width: 110px;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for room in rooms %}
+              <tr>
+                <td>{{ room.name }}</td>
+                <td>{{ room.platform }}</td>
+                <td>{{ room.solved_at_dmy or "-" }}</td>
+                <td>
+                  {% if room.redo_at_dmy %}
+                    {{ room.redo_at_dmy }}
+                  {% else %}
+                    <span class="text-muted small">not set</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if room.used_writeup %}
+                    <span class="badge badge-writeup">With writeup</span>
+                  {% else %}
+                    <span class="badge badge-clean">Clean solve</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if room.notes %}
+                    <span class="small">{{ room.notes }}</span>
+                  {% else %}
+                    <span class="text-muted small">-</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <div class="d-flex gap-1">
+                    <a href="{{ url_for('edit_room', room_id=room.id) }}" class="btn btn-sm btn-outline-light">Edit</a>
+                    <form action="{{ url_for('delete_room', room_id=room.id) }}" method="POST" onsubmit="return confirm('Delete this room log?');">
+                      <button class="btn btn-sm btn-outline-danger" type="submit">Del</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p class="text-muted mb-0">No rooms logged yet. Start by adding your latest THM/HTB box.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
